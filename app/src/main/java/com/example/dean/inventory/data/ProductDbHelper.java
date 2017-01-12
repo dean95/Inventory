@@ -28,8 +28,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 + ProductEntry.COLUMN_PRODUCT_SUPPLIER + " TEXT NOT NULL);";
 
         db.execSQL(SQL_CREATE_PRODUCTS_TABLE);
-
-        Log.i("ProductDbHelper", SQL_CREATE_PRODUCTS_TABLE);
     }
 
     @Override
