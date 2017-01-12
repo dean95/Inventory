@@ -1,12 +1,18 @@
 package com.example.dean.inventory;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+
+import com.example.dean.inventory.data.ProductContract.ProductEntry;
+import com.example.dean.inventory.data.ProductDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +29,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        displayDatabaseInfo();
+    }
+
+    private void displayDatabaseInfo() {
+        ProductDbHelper mDbHelper = new ProductDbHelper(this);
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + ProductEntry.TABLE_NAME, null);
+
+        try {
+            TextView displayText = (TextView) findViewById(R.id.text_view_product);
+            displayText.setText("Number of rows in product database table: " + cursor.getCount());
+        } finally {
+            cursor.close();
+        }
     }
 
     @Override
