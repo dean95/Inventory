@@ -48,7 +48,18 @@ public class MainActivity extends AppCompatActivity {
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + ProductEntry.TABLE_NAME, null);
+        String[] projecttion = {
+                ProductEntry._ID,
+                ProductEntry.COLUMN_PRODUCT_NAME,
+                ProductEntry.COLUMN_PRODUCT_PRICE,
+                ProductEntry.COLUMN_PRODUCT_QUANTITY,
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER
+        };
+
+        Cursor cursor = db.query(
+                ProductEntry.TABLE_NAME,
+                projecttion,
+                null, null, null, null, null);
 
         try {
             TextView displayText = (TextView) findViewById(R.id.text_view_product);
