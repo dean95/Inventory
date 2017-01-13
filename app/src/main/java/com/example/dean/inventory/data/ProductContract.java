@@ -1,14 +1,23 @@
 package com.example.dean.inventory.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class ProductContract {
+
+    public static final String CONTENT_AUTHORITY = "com.example.dean.inventory";
+
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public static final String PATH_PRODUCTS = "products";
 
     private ProductContract() {
 
     }
 
     public static final class ProductEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PRODUCTS);
 
         public static final String TABLE_NAME = "products";
 
