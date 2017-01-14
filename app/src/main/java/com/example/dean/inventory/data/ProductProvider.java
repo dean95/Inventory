@@ -2,11 +2,24 @@ package com.example.dean.inventory.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
 public class ProductProvider extends ContentProvider {
+
+    private static final int PRODUCTS = 100;
+    private static final int PRODUCT_ID = 100;
+
+    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+    static {
+        sUriMatcher.addURI(ProductContract.CONTENT_AUTHORITY,
+                ProductContract.PATH_PRODUCTS, PRODUCTS);
+        sUriMatcher.addURI(ProductContract.CONTENT_AUTHORITY,
+                ProductContract.PATH_PRODUCTS + "/#", PRODUCT_ID);
+    }
 
     private ProductDbHelper mDbHelper;
 
