@@ -8,10 +8,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.dean.inventory.data.ProductContract.ProductEntry;
 
 public class ProductProvider extends ContentProvider {
+
+    public static final String LOG_TAG = ProductProvider.class.getSimpleName();
 
     private static final int PRODUCTS = 100;
     private static final int PRODUCT_ID = 101;
@@ -69,7 +72,14 @@ public class ProductProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case PRODUCTS:
+                return insertPet(uri, contentValues);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        }
     }
 
     @Override
@@ -80,5 +90,18 @@ public class ProductProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
         return 0;
+    }
+
+    private Uri insertPet(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        long id = db.insert(ProductEntry.TABLE_NAME, null, contentValues);
+
+        if (id == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        } else {
+            return ContentUris.withAppendedId(uri, id);
+        }
     }
 }

@@ -10,4 +10,6 @@
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
     <string name="editor_activity_title_new_product">Add a Product</string>
+    <string name="editor_insert_product_failed">Error with saving product</string>
+    <string name="editor_insert_product_successful">Product saved</string>
 </resources>
