@@ -45,9 +45,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayDatabaseInfo() {
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         String[] projection = {
                 ProductEntry._ID,
                 ProductEntry.COLUMN_PRODUCT_NAME,
@@ -56,10 +53,8 @@ public class MainActivity extends AppCompatActivity {
                 ProductEntry.COLUMN_PRODUCT_SUPPLIER
         };
 
-        Cursor cursor = db.query(
-                ProductEntry.TABLE_NAME,
-                projection,
-                null, null, null, null, null);
+        Cursor cursor = getContentResolver().query(ProductEntry.CONTENT_URI, projection,
+                null, null, null);
 
         TextView displayText = (TextView) findViewById(R.id.text_view_product);
 
