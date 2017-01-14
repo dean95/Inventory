@@ -3,6 +3,7 @@ package com.example.dean.inventory.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -93,6 +94,21 @@ public class ProductProvider extends ContentProvider {
     }
 
     private Uri insertPet(Uri uri, ContentValues contentValues) {
+        String name = contentValues.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
+        if (name == null) {
+            throw new IllegalArgumentException("Product requires a name");
+        }
+
+        Double price = contentValues.getAsDouble(ProductEntry.COLUMN_PRODUCT_PRICE);
+        if (price == null) {
+            throw new IllegalArgumentException("Product requires a price");
+        }
+
+        String supplier = contentValues.getAsString(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+        if (supplier == null) {
+            throw new IllegalArgumentException("Product requires a supplier");
+        }
+
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         long id = db.insert(ProductEntry.TABLE_NAME, null, contentValues);
