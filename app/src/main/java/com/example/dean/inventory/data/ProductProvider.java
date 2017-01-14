@@ -89,8 +89,51 @@ public class ProductProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(Uri uri, ContentValues contentValues, String selection,
+                      String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case PRODUCTS:
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+            case PRODUCT_ID:
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+        }
         return 0;
+    }
+
+    private int updateProduct(Uri uri, ContentValues values, String selection,
+                              String[] selectionArgs) {
+        if (values.size() == 0) {
+            return 0;
+        }
+        
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
+            String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Product requires a name");
+            }
+        }
+
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
+            Double price = values.getAsDouble(ProductEntry.COLUMN_PRODUCT_PRICE);
+            if (price == null) {
+                throw new IllegalArgumentException("Product requires a price");
+            }
+        }
+
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_SUPPLIER)) {
+            String supplier = values.getAsString(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+            if (supplier == null) {
+                throw new IllegalArgumentException("Product requires a supplier");
+            }
+        }
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        return db.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 
     private Uri insertPet(Uri uri, ContentValues contentValues) {
