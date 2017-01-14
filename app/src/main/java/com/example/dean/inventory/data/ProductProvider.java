@@ -84,8 +84,21 @@ public class ProductProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case PRODUCTS:
+                return db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+            case PRODUCT_ID:
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
     }
 
     @Override
@@ -100,8 +113,9 @@ public class ProductProvider extends ContentProvider {
                 selection = ProductEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
                 return updateProduct(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
         }
-        return 0;
     }
 
     private int updateProduct(Uri uri, ContentValues values, String selection,
@@ -109,7 +123,7 @@ public class ProductProvider extends ContentProvider {
         if (values.size() == 0) {
             return 0;
         }
-        
+
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
             String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
             if (name == null) {
