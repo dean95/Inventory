@@ -31,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ListView productListView = (ListView) findViewById(R.id.list);
+
+        View emptyView = findViewById(R.id.empty_view);
+
+        productListView.setEmptyView(emptyView);
+
         displayDatabaseInfo();
     }
 

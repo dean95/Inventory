@@ -12,4 +12,6 @@
     <string name="editor_activity_title_new_product">Add a Product</string>
     <string name="editor_insert_product_failed">Error with saving product</string>
     <string name="editor_insert_product_successful">Product saved</string>
+    <string name="empty_view_title_text">It\'s a bit lonely here...</string>
+    <string name="empty_view_subtitle_text">Get started by adding a pet</string>
 </resources>
