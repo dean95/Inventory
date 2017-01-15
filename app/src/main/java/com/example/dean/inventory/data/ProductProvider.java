@@ -60,6 +60,8 @@ public class ProductProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
 
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;
     }
 
@@ -95,18 +97,28 @@ public class ProductProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
+        int rowsDeleted;
+
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
             case PRODUCTS:
-                return db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case PRODUCT_ID:
                 selection = ProductEntry._ID + "=?";
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
-                return db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
+
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsDeleted;
     }
 
     @Override
@@ -155,7 +167,13 @@ public class ProductProvider extends ContentProvider {
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        return db.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = db.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsUpdated;
     }
 
     private Uri insertPet(Uri uri, ContentValues contentValues) {
@@ -181,8 +199,10 @@ public class ProductProvider extends ContentProvider {
         if (id == -1) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
-        } else {
-            return ContentUris.withAppendedId(uri, id);
         }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return ContentUris.withAppendedId(uri, id);
     }
 }
