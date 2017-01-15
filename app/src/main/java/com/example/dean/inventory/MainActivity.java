@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.dean.inventory.data.ProductContract.ProductEntry;
@@ -51,38 +52,11 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = getContentResolver().query(ProductEntry.CONTENT_URI, projection,
                 null, null, null);
 
-        TextView displayText = (TextView) findViewById(R.id.text_view_product);
+        ListView productListView = (ListView) findViewById(R.id.list);
 
-        try {
-            displayText.setText("The products table contains " + cursor.getCount() + " pets.\n\n");
-            displayText.append(ProductEntry._ID + "-" +
-                ProductEntry.COLUMN_PRODUCT_NAME + "-" +
-                ProductEntry.COLUMN_PRODUCT_PRICE + "-" +
-                ProductEntry.COLUMN_PRODUCT_QUANTITY + "-" +
-                ProductEntry.COLUMN_PRODUCT_SUPPLIER + "\n");
+        ProductCursorAdapter adapter = new ProductCursorAdapter(this, cursor);
 
-            int idColumnIndex = cursor.getColumnIndex(ProductEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
-            int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE);
-            int quantityColummIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY);
-            int supplierColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
-
-            while (cursor.moveToNext()) {
-                int currentId = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
-                double currentPrice = cursor.getDouble(priceColumnIndex);
-                int currentQuantity = cursor.getInt(quantityColummIndex);
-                String currentSupplier = cursor.getString(supplierColumnIndex);
-
-                displayText.append("\n" + currentId + "-" +
-                    currentName + "-" +
-                    currentPrice + "-" +
-                    currentQuantity + "-" +
-                    currentSupplier);
-            }
-        } finally {
-            cursor.close();
-        }
+        productListView.setAdapter(adapter);
     }
 
     private void insertPet() {
