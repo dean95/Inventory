@@ -1,7 +1,10 @@
 package com.example.dean.inventory;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -11,11 +14,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.dean.inventory.data.ProductContract.ProductEntry;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int PRODUCT_LOADER = 0;
+
+    ProductCursorAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,35 +41,12 @@ public class MainActivity extends AppCompatActivity {
         ListView productListView = (ListView) findViewById(R.id.list);
 
         View emptyView = findViewById(R.id.empty_view);
-
         productListView.setEmptyView(emptyView);
 
-        displayDatabaseInfo();
-    }
+        mAdapter = new ProductCursorAdapter(this, null);
+        productListView.setAdapter(mAdapter);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
-    }
-
-    private void displayDatabaseInfo() {
-        String[] projection = {
-                ProductEntry._ID,
-                ProductEntry.COLUMN_PRODUCT_NAME,
-                ProductEntry.COLUMN_PRODUCT_PRICE,
-                ProductEntry.COLUMN_PRODUCT_QUANTITY,
-                ProductEntry.COLUMN_PRODUCT_SUPPLIER
-        };
-
-        Cursor cursor = getContentResolver().query(ProductEntry.CONTENT_URI, projection,
-                null, null, null);
-
-        ListView productListView = (ListView) findViewById(R.id.list);
-
-        ProductCursorAdapter adapter = new ProductCursorAdapter(this, cursor);
-
-        productListView.setAdapter(adapter);
+        getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
 
     private void insertPet() {
@@ -86,12 +70,35 @@ public class MainActivity extends AppCompatActivity {
         switch (menuItem.getItemId()) {
             case R.id.action_insert_dummy_data:
                 insertPet();
-                displayDatabaseInfo();
                 return true;
             case R.id.action_delete_all_entries:
                 return true;
         }
 
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                ProductEntry._ID,
+                ProductEntry.COLUMN_PRODUCT_NAME,
+                ProductEntry.COLUMN_PRODUCT_QUANTITY
+        };
+
+        return new CursorLoader(this,
+                ProductEntry.CONTENT_URI,
+                projection,
+                null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }
