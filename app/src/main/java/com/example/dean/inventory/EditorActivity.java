@@ -1,6 +1,7 @@
 package com.example.dean.inventory;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,16 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        Intent intent = getIntent();
+
+        Uri currentProductUri = intent.getData();
+
+        if (currentProductUri == null) {
+            setTitle(getString(R.string.editor_activity_title_new_product));
+        } else {
+            setTitle(getString(R.string.editor_activity_title_edit_product));
+        }
 
         mNameEditText = (EditText) findViewById(R.id.edit_product_name);
         mPriceEditText = (EditText) findViewById(R.id.edit_product_price);

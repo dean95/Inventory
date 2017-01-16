@@ -1,6 +1,7 @@
 package com.example.dean.inventory;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.dean.inventory.data.ProductContract.ProductEntry;
@@ -45,6 +47,19 @@ public class MainActivity extends AppCompatActivity
 
         mAdapter = new ProductCursorAdapter(this, null);
         productListView.setAdapter(mAdapter);
+
+        productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+
+                Uri contentUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
+
+                intent.setData(contentUri);
+
+                startActivity(intent);
+            }
+        });
 
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
