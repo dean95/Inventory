@@ -62,7 +62,7 @@ public class EditorActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                insertProduct();
+                saveProduct();
                 finish();
                 return true;
             case R.id.action_delete:
@@ -75,7 +75,7 @@ public class EditorActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertProduct() {
+    private void saveProduct() {
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
         double price = Double.parseDouble(priceString);
@@ -89,14 +89,27 @@ public class EditorActivity extends AppCompatActivity
         values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
         values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER, supplierString);
 
-        Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
+        if (mCurrentProductUri == null) {
+            Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
 
-        if (newUri == null) {
-            Toast.makeText(this, getString(R.string.editor_insert_product_failed),
-                    Toast.LENGTH_SHORT).show();
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.editor_insert_product_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editor_insert_product_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, getString(R.string.editor_insert_product_successful),
-                    Toast.LENGTH_SHORT).show();
+            int rowsAffected = getContentResolver().update(mCurrentProductUri, values,
+                    null, null);
+
+            if (rowsAffected == 0) {
+                Toast.makeText(this, getString(
+                        R.string.editor_update_product_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(
+                        R.string.editor_update_product_successful), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
