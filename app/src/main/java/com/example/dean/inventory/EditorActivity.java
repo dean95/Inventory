@@ -1,7 +1,11 @@
 package com.example.dean.inventory;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +17,12 @@ import android.widget.Toast;
 
 import com.example.dean.inventory.data.ProductContract.ProductEntry;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int EXISTING_PET_LOADER = 0;
+
+    private Uri mCurrentProductUri;
 
     private EditText mNameEditText;
     private EditText mPriceEditText;
@@ -27,12 +36,14 @@ public class EditorActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        Uri currentProductUri = intent.getData();
+        mCurrentProductUri = intent.getData();
 
-        if (currentProductUri == null) {
+        if (mCurrentProductUri == null) {
             setTitle(getString(R.string.editor_activity_title_new_product));
         } else {
             setTitle(getString(R.string.editor_activity_title_edit_product));
+
+            getLoaderManager().initLoader(EXISTING_PET_LOADER, null, this);
         }
 
         mNameEditText = (EditText) findViewById(R.id.edit_product_name);
@@ -87,5 +98,55 @@ public class EditorActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.editor_insert_product_successful),
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                ProductEntry._ID,
+                ProductEntry.COLUMN_PRODUCT_NAME,
+                ProductEntry.COLUMN_PRODUCT_PRICE,
+                ProductEntry.COLUMN_PRODUCT_QUANTITY,
+                ProductEntry.COLUMN_PRODUCT_SUPPLIER
+        };
+
+        return new CursorLoader(
+                this,
+                mCurrentProductUri,
+                projection,
+                null, null, null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor == null ||cursor.getCount() < 1) {
+            return;
+        }
+
+        if (cursor.moveToFirst()) {
+            int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
+            int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_PRICE);
+            int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_QUANTITY);
+            int supplierColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+
+            String name = cursor.getString(nameColumnIndex);
+            Double price = cursor.getDouble(priceColumnIndex);
+            Integer quantity = cursor.getInt(quantityColumnIndex);
+            String supplier = cursor.getString(supplierColumnIndex);
+
+            mNameEditText.setText(name);
+            mPriceEditText.setText(price.toString());
+            mQuantityEditText.setText(quantity.toString());
+            mSupplierEditText.setText(supplier);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mNameEditText.setText("");
+        mPriceEditText.setText("");
+        mQuantityEditText.setText("");
+        mSupplierEditText.setText("");
     }
 }
