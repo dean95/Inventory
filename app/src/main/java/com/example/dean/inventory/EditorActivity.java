@@ -100,6 +100,7 @@ public class EditorActivity extends AppCompatActivity
                 finish();
                 return true;
             case R.id.action_delete:
+                showDeleteConfirmationDialog();
                 return true;
             case android.R.id.home:
                 if (!mProductHasChanged) {
@@ -141,6 +142,28 @@ public class EditorActivity extends AppCompatActivity
         showUnsavedChangesDialog(discardButtonClickListener);
     }
 
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteProduct();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null) {
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void showUnsavedChangesDialog(
             DialogInterface.OnClickListener discardButtonClickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -157,6 +180,22 @@ public class EditorActivity extends AppCompatActivity
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void deleteProduct() {
+        if (mCurrentProductUri != null) {
+            int rowsDeleted = getContentResolver().delete(mCurrentProductUri, null, null);
+
+            if (rowsDeleted == 0) {
+                Toast.makeText(this, getString(R.string.editor_delete_product_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editor_delete_product_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        finish();
     }
 
     private void saveProduct() {
