@@ -210,7 +210,10 @@ public class EditorActivity extends AppCompatActivity
             return;
         }
 
-        Double price = Double.parseDouble(priceString);
+        Double price = Double.valueOf(0);
+        if (!TextUtils.isEmpty(priceString)) {
+            price = Double.parseDouble(priceString);
+        }
 
         ContentValues values = new ContentValues();
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);

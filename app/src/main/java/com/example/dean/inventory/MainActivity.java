@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity
                 insertPet();
                 return true;
             case R.id.action_delete_all_entries:
+                deleteAllPets();
                 return true;
         }
 
@@ -115,5 +117,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    private void deleteAllPets() {
+        int rowsDeleted = getContentResolver().delete(ProductEntry.CONTENT_URI, null, null);
+        Log.v("MainActivity", rowsDeleted + " rows deleted from product database");
     }
 }
