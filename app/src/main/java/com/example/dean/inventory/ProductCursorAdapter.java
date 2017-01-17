@@ -2,6 +2,7 @@ package com.example.dean.inventory;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,9 @@ public class ProductCursorAdapter extends CursorAdapter {
         String productName = cursor.getString(nameColumnIndex);
         Integer productQuantity = cursor.getInt(quantityColumnIndex);
 
+        if (TextUtils.isEmpty(productName)) {
+            productName = context.getString(R.string.unknown_name);
+        }
         nameTextView.setText(productName);
         summaryTextView.setText(productQuantity.toString());
     }
