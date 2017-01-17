@@ -55,6 +55,8 @@ public class EditorActivity extends AppCompatActivity
 
         if (mCurrentProductUri == null) {
             setTitle(getString(R.string.editor_activity_title_new_product));
+
+            invalidateOptionsMenu();
         } else {
             setTitle(getString(R.string.editor_activity_title_edit_product));
 
@@ -75,6 +77,18 @@ public class EditorActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_editor, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (mCurrentProductUri == null) {
+            MenuItem item = menu.findItem(R.id.action_delete);
+            item.setVisible(false);
+        }
+
         return true;
     }
 
